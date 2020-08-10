@@ -13,7 +13,7 @@ const resolveFormat = (format) => {
     thousandSeparate = true;
 
   const match = format && format.match(/^([^#0%‰]*)([#,]*[0,]*)(\.0*#*)?([%‰]?)([^0#]*)$/);
-  
+
   if (!match) {
     throw '非法的字符串格式';
   }
@@ -54,9 +54,9 @@ const resolveFormat = (format) => {
   };
   formatCache[format] = config;
   return config;
-}
+};
 
-function enlarge(n, multi) {
+function enlarge (n, multi) {
   if (!multi) {
     return n;
   }
@@ -74,7 +74,8 @@ function enlarge(n, multi) {
     return +num;
   }
 }
-function shrink(n, multi) {
+
+function shrink (n, multi) {
   if (!multi) {
     return n;
   }
@@ -96,7 +97,7 @@ function shrink(n, multi) {
   }
 }
 
-function adjust(n, scale) {
+function adjust (n, scale) {
   let num = `${n}`;
   if (num.includes('.')) {
     const arr = num.split('.');
@@ -107,7 +108,7 @@ function adjust(n, scale) {
   }
 }
 
-function round(n, scale, roundingMode) {
+function round (n, scale, roundingMode) {
   let [int, decimal] = `${n}`.split('.');
   const sign = n > 0 ? '' : '-';
   if (!decimal) {
@@ -126,13 +127,13 @@ function round(n, scale, roundingMode) {
       return +adjust(n, scale).toFixed(scale);
     } else if (roundingMode === RoundingMode.HALF_DOWN) {
       const decimalArr = decimal.split('');
-      if (decimalArr[scale] == 5) {
+      if (decimalArr[scale] === '5') {
         decimalArr[scale] = 1;
       }
       return +(+[int, decimalArr.join('')].join('.')).toFixed(scale);
     } else if (roundingMode === RoundingMode.HALF_EVEN) {
       const decimalArr = decimal.split('');
-      if (decimalArr[scale] == 5) {
+      if (decimalArr[scale] === '5') {
         let lastNum = decimalArr[scale - 1] || int.slice(-1);
         if (+lastNum % 2 === 0) {
           decimalArr.splice(scale);
@@ -152,7 +153,7 @@ function round(n, scale, roundingMode) {
 }
 
 class DecimalFormat {
-  constructor(format = '', config, roundingMode = RoundingMode.HALF_UP) {
+  constructor (format = '', config, roundingMode = RoundingMode.HALF_UP) {
     if (typeof config === 'number') {
       roundingMode = config;
       config = {};
@@ -160,17 +161,18 @@ class DecimalFormat {
     this.config = { ...resolveFormat(format), ...config };
     this.roundingMode = roundingMode;
   }
-  setRoundingMode(roundingMode) {
+
+  setRoundingMode (roundingMode) {
     this.roundingMode = roundingMode;
   }
 
-  format(n) {
+  format (n) {
     const { maxScale, minScale, percent, length, thousandSeparate, prefix, suffix } = this.config;
     let number = +n;
     if (isNaN(number)) {
       throw 'not a valid number';
     }
-    const multi = percent == '%' ? 2 : percent === '‰' ? 3 : 0;
+    const multi = percent === '%' ? 2 : percent === '‰' ? 3 : 0;
     number = enlarge(number, multi);
     if (maxScale !== null) {
       number = round(number, maxScale, this.roundingMode).toFixed(maxScale);
@@ -181,7 +183,7 @@ class DecimalFormat {
     if (length) {
       int = int.padStart(length, 0);
     }
-    if (thousandSeparate < int.length) {
+    if (thousandSeparate > 0 && thousandSeparate < int.length) {
       int = int.replace(new RegExp(`(\\d{1,${thousandSeparate}})(?=(?:\\d{${thousandSeparate}})+$)`, 'g'), '$1,');
     }
 
@@ -203,4 +205,4 @@ export const RoundingMode = {
   HALF_DOWN: 5,
   HALF_EVEN: 6,
   UNNECESSARY: 7,
-}
+};

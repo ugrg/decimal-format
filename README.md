@@ -50,3 +50,9 @@ RoundingMode共有八种
     RoundingMode.HALF_EVEN    // 6  取邻近的数，遇到5时舍入后保证前一位为偶数  2.5 -> 2  3.5 -> 4
     RoundingMode.UNNECESSARY  // 7  断言数字不用舍入
 ```
+
+
+# update log
+- 1.2.1
+修复在未指定`thousandSeparate`时的异常。
+
